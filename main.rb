@@ -1,11 +1,60 @@
 # frozen_string_literal: true
 
 require 'sinatra'
+require 'sinatra/json'
+require 'time'
 
-# TODO： 開発環境と本番環境でそれぞれに必要な情報やコマンドのふろーを整理する
-#       今はSinatraの :development を明示的にコードに残すか、コマンドオプションや環境変数なんかで切り替えるようにするか思案中
-# set :environment, :development
+class Memo
+  attr_accessor :title, :content, :updated_at
+  attr_reader :created_at, :id
 
-get '/' do
-  erb :'index.html'
+  def initialize(id, title, content)
+    @id = id
+    @title = title
+    @content = content
+    @created_at = Time.now
+    @updated_at = Time.now
+  end
+
+  def to_json(*)
+    instance_variables.map do |key|
+      [key.to_s.tr('@', ''), instance_variable_get(key)]
+    end.to_h
+  end
+end
+
+class App < Sinatra::Base
+  def initialize
+    super
+    @memos = []
+  end
+
+  get '/' do
+    erb :'index.html'
+  end
+
+  get '/memos' do
+    json({ memos: @memos.map(&:to_json) })
+  end
+
+  post '/memos' do
+    puts "post data: #{params}"
+    # TODO: バリデーションなどはあとでやる
+    new_memo = Memo.new(@memos.size + 1, params[:title], params[:content])
+    @memos << new_memo
+
+    redirect '/memos'
+  end
+
+  get '/memos/:id' do
+    params['id']
+  end
+
+  get '/info' do
+    puts response
+
+    status 418
+    headers 'Content-Type' => 'text/plain'
+    body 'I am a teapot'
+  end
 end
