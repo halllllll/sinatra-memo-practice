@@ -3,13 +3,14 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'time'
+require 'securerandom'
 
 class Memo
   attr_accessor :title, :content, :updated_at
   attr_reader :created_at, :id
 
-  def initialize(id, title, content)
-    @id = id
+  def initialize(title, content)
+    @id = SecureRandom.uuid
     @title = title
     @content = content
     @created_at = Time.now
@@ -40,14 +41,18 @@ class App < Sinatra::Base
   post '/memos' do
     puts "post data: #{params}"
     # TODO: バリデーションなどはあとでやる
-    new_memo = Memo.new(@memos.size + 1, params[:title], params[:content])
+    new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
-
+    status 201 # 不要？
     redirect '/memos'
   end
 
   get '/memos/:id' do
-    params['id']
+    target_id = params['id']
+    memo = @memos.find { |memo| memo.id == target_id }
+    halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
+
+    json({ result: 'success', body: memo.to_json })
   end
 
   get '/info' do

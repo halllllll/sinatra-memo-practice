@@ -33,16 +33,27 @@ bundle exec erb_lint --lint-all
 ## API
 
 
-### Error
-
-Error response with HTTP status code
+### Response
 
 ```json
 {
-  "message": "error_message",
-  "type": "error_type"
+  "result": "success"
+  "body": ...
 }
 ```
+
+or, Error response with message
+
+```json
+{
+  "result": "error"
+  "message": ...
+}
+```
+
+
+
+
 ### Memo structure
 
 |Parameter|Type|Desc|
