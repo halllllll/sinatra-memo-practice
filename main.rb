@@ -34,22 +34,21 @@ class App < Sinatra::Base
     erb :'index.html'
   end
 
-  get '/memos' do
+  get '/api/memos' do
     json({ result: 'success', body: @memos.map(&:to_json) })
   end
 
-  post '/memos' do
-    puts "post data: #{params}"
+  post '/api/memos' do
     halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
     halt 400, json({ result: 'error', message: 'empty value not acceptable' }) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
 
     new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
     status 201 # TODO: 不要？
-    redirect '/memos'
+    redirect '/api/memos'
   end
 
-  get '/memos/:id' do
+  get '/api/memos/:id' do
     target_id = params['id']
     memo = @memos.find { |memo| memo.id == target_id }
     halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
@@ -58,11 +57,10 @@ class App < Sinatra::Base
     json({ result: 'success', body: memo.to_json })
   end
 
-  put '/memos/:id' do
+  put '/api/memos/:id' do
     target_id = params['id']
     memo = @memos.find { |memo| memo.id == target_id }
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
-
     halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
 
     memo.title = params[:title]
@@ -72,7 +70,7 @@ class App < Sinatra::Base
     status 204
   end
 
-  delete '/memos/:id' do
+  delete '/api/memos/:id' do
     target_id = params['id']
     memo = @memos.find { |memo| memo.id == target_id }
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
