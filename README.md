@@ -101,7 +101,7 @@ Content-Type: application/json
 ### GET /memos/\{:memo_id\}
 Get a memo.
 
-### PATCH /memos/\{:memo_id\}
+### PUT /memos/\{:memo_id\}
 Update an exists memo.
 
 ### DELETE /memos/\{:memo_id\}

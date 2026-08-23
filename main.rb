@@ -39,8 +39,8 @@ class App < Sinatra::Base
   end
 
   post '/memos' do
-    puts "post data: #{params}"
-    # TODO: バリデーションなどはあとでやる
+    halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
+
     new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
     status 201 # 不要？
@@ -53,6 +53,22 @@ class App < Sinatra::Base
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
 
     json({ result: 'success', body: memo.to_json })
+  end
+
+  put '/memos/:id' do
+    target_id = params['id']
+    memo = @memos.find { |memo| memo.id == target_id }
+    halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
+
+    target_index = @memos.find_index(memo)
+
+    halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
+
+    new_memo = Memo.new(params[:title], params[:content])
+    new_memo.updated_at = Time.now
+    @memos[target_index] = new_memo
+
+    redirect '/'
   end
 
   get '/info' do
