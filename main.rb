@@ -71,7 +71,7 @@ class App < Sinatra::Base
     new_memo.updated_at = Time.now
     @memos[target_index] = new_memo
 
-    redirect '/'
+    status 204
   end
 
   delete '/memos/:id' do
@@ -83,7 +83,6 @@ class App < Sinatra::Base
     @memos.delete_at(target_index)
 
     status 204
-    # redirect '/' # NoMethodError
   end
 
   get '/info' do
