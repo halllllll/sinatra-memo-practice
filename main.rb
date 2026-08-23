@@ -35,11 +35,13 @@ class App < Sinatra::Base
   end
 
   get '/memos' do
-    json({ memos: @memos.map(&:to_json) })
+    json({ result: 'success', body: @memos.map(&:to_json) })
   end
 
   post '/memos' do
-    halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
+    puts "post data: #{params}"
+    halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
+    halt 400, json({ result: 'error', message: 'empty value not acceptable' }) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
 
     new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
@@ -50,7 +52,8 @@ class App < Sinatra::Base
   get '/memos/:id' do
     target_id = params['id']
     memo = @memos.find { |memo| memo.id == target_id }
-    halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
+    halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
+    halt 400, json({ result: 'error', message: 'empty value not acceptable' }) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
 
     json({ result: 'success', body: memo.to_json })
   end
@@ -69,6 +72,18 @@ class App < Sinatra::Base
     @memos[target_index] = new_memo
 
     redirect '/'
+  end
+
+  delete '/memos/:id' do
+    target_id = params['id']
+    memo = @memos.find { |memo| memo.id == target_id }
+    halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
+
+    target_index = @memos.find_index(memo)
+    @memos.delete_at(target_index)
+
+    status 204
+    # redirect '/' # NoMethodError
   end
 
   get '/info' do
