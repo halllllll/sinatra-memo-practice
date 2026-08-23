@@ -45,7 +45,7 @@ class App < Sinatra::Base
 
     new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
-    status 201 # 不要？
+    status 201 # TODO: 不要？
     redirect '/memos'
   end
 
@@ -63,13 +63,11 @@ class App < Sinatra::Base
     memo = @memos.find { |memo| memo.id == target_id }
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
 
-    target_index = @memos.find_index(memo)
-
     halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
 
-    new_memo = Memo.new(params[:title], params[:content])
-    new_memo.updated_at = Time.now
-    @memos[target_index] = new_memo
+    memo.title = params[:title]
+    memo.content = params[:content]
+    memo.updated_at = Time.now
 
     status 204
   end
