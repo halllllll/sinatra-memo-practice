@@ -1,6 +1,6 @@
 <section>
   <h2>Memo list</h2>
-  <button>+ memo</button>
+  <a href="/memos/new" role="button">+ memo</a>
   <p>
     <%= @memos.size.zero? ? "No memo created yet" : "memo count: " + @memos.size.to_s %>
   </p>

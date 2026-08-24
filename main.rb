@@ -5,6 +5,8 @@ require 'sinatra/json'
 require 'time'
 require 'securerandom'
 
+# set :show_exceptions, false
+
 class Memo
   attr_accessor :title, :content, :updated_at
   attr_reader :created_at, :id
@@ -32,6 +34,24 @@ class App < Sinatra::Base
 
   get '/' do
     erb :'index.html'
+  end
+
+  get '/memos/new' do
+    erb :'new.html'
+  end
+
+  post '/memos' do
+    status 400
+    @error_message = 'required parameter not found'
+    return erb :'new.html' if [params[:title], params[:content]].any?(nil)
+
+    @error_message = 'empty value not acceptable'
+    return erb :'new.html' if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
+
+    new_memo = Memo.new(params[:title], params[:content])
+    @memos << new_memo
+    status 201 # TODO: 不要？
+    redirect '/'
   end
 
   get '/memos/:id/detail' do

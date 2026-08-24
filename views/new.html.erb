@@ -1,0 +1,13 @@
+<section>
+  <a href="/">back to home</a>
+  <h2>new memo</h2>
+  <p><%= @error_message %></p>
+  <form action="/memos" method="post">
+    <label for="title">Title</label>
+    <input id="title" name="title" minlength="3" maxlength="10" required>
+    <label for="content">Memo</label>
+    <textarea id="content" name="content" minlength="5" maxlength="50" required></textarea>
+    <button>create</button>
+  </form>
+
+</section>
