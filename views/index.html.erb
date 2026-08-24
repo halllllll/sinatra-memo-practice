@@ -1,1 +1,21 @@
-Hello!<br>
+<section>
+  <h2>Memo list</h2>
+  <button>+ memo</button>
+  <p>
+    <%= @memos.size.zero? ? "No memo created yet" : "memo count: " + @memos.size.to_s %>
+  </p>
+  <div>
+    <ul>
+      <% @memos.each do |memo| %>
+        <li>
+          <p>
+            <a href="/memos/<%= memo.id %>/detail"><%= memo.title %></a>
+            <span>- (last update:
+              <%= memo.updated_at.strftime("%F %H:%M") %>)
+            </span>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</section>

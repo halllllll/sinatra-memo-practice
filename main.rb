@@ -34,6 +34,13 @@ class App < Sinatra::Base
     erb :'index.html'
   end
 
+  get '/memos/:id/detail' do
+    target_id = params['id']
+    memo = @memos.find { |memo| memo.id == target_id }
+    @memo = memo
+    erb :'detail.html'
+  end
+
   get '/api/memos' do
     json({ result: 'success', body: @memos.map(&:to_json) })
   end
