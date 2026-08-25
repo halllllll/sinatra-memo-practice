@@ -34,6 +34,25 @@ class App < Sinatra::Base
     @memos = []
   end
 
+  helpers do
+    def pick_memo(memo_id)
+      target_memo = @memos.find { |memo| memo.id == memo_id }
+      @error_message = 'memo not found'
+      halt 404, erb(:'index.html') unless target_memo
+
+      target_memo
+    end
+
+    def validate_params(params, page)
+      status 400
+      @error_message = 'required parameter not found'
+      halt 400, erb(page) if [params[:title], params[:content]].any?(nil)
+
+      @error_message = 'empty value not acceptable'
+      halt 400, erb(page) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
+    end
+  end
+
   get '/' do
     erb :'index.html'
   end
@@ -43,13 +62,7 @@ class App < Sinatra::Base
   end
 
   post '/memos' do
-    status 400
-    @error_message = 'required parameter not found'
-    return erb :'new.html' if [params[:title], params[:content]].any?(nil)
-
-    @error_message = 'empty value not acceptable'
-    return erb :'new.html' if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
-
+    validate_params(params, :'new.html')
     new_memo = Memo.new(params[:title], params[:content])
     @memos << new_memo
     status 201 # TODO: 不要？
@@ -58,44 +71,37 @@ class App < Sinatra::Base
 
   get '/memos/:id/detail' do
     target_id = params['id']
-    memo = @memos.find { |memo| memo.id == target_id }
-    # TODO: error handling(NOT FOUND)
+    memo = pick_memo(target_id)
     @memo = memo
+
     erb :'detail.html'
   end
 
   get '/memos/:id/edit' do
-    # TODO: error handling(NOT FOUND)
     target_id = params['id']
-    memo = @memos.find { |memo| memo.id == target_id }
+    memo = pick_memo(target_id)
     @memo = memo
     erb :'edit.html'
   end
 
   put '/memos/:id' do
-    # TODO: error handling(NOT FOUND)
     target_id = params['id']
-    target_memo = @memos.find { |memo| memo.id == target_id }
+    memo = pick_memo(target_id)
+    @memo = memo
 
-    # TODO: 確認
-    status 404
-    @error_message = 'memo not found'
-    return erb :'index.html' if target_memo.nil?
+    validate_params(params, :'edit.html')
 
-    @memo = target_memo
-    status 400
-    @error_message = 'required parameter not found'
-    return erb :'edit.html' if [params[:title], params[:content]].any?(nil)
-
-    @error_message = 'empty value not acceptable'
-    return erb :'edit.html' if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
-
-    target_memo.title = @params[:title]
-    target_memo.content = @params[:content]
-    target_memo.updated_at = Time.now
+    memo.title = params[:title]
+    memo.content = params[:content]
+    memo.updated_at = Time.now
 
     status 200
     redirect "/memos/#{target_id}/detail"
+  end
+
+  not_found do
+    @error_message = 'This is nowhere to be found.'
+    erb :'error.html'
   end
 
   get '/api/memos' do
