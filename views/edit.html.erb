@@ -1,0 +1,21 @@
+<section>
+  <a href="/">back to home</a>
+  <h2>update memo</h2>
+  <p><%= @error_message %></p>
+  <form action="/memos/<%= @memo.id %>" method="post">
+    <label for="title">Title</label>
+    <input
+      id="title"
+      name="title"
+      value="<%= @memo.title %>"
+      minlength="3"
+      maxlength="10"
+      required
+    >
+    <label for="content">Memo</label>
+    <textarea id="content" name="content" minlength="5" maxlength="50" required><%= @memo.content %>
+    </textarea>
+    <input type="hidden" name="_method" value="put">
+    <input type="submit" value="upate">
+  </form>
+</section>

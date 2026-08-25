@@ -27,7 +27,6 @@ class Memo
 end
 
 class App < Sinatra::Base
-  set :views, 'views'
   set :method_override, true
 
   def initialize
