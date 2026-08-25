@@ -2,5 +2,10 @@
   <a href="/">back to home</a>
   <h2><%= @memo.title %></h2>
   <div><%= @memo.content %></div>
+  <p>last update:
+    <%= @memo.updated_at.strftime("%F %H:%M") %></p>
   <hr>
+  <a href="/memos/<%= @memo.id %>/edit" role="button">
+    edit
+  </a>
 </section>

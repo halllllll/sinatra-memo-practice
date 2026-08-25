@@ -27,6 +27,9 @@ class Memo
 end
 
 class App < Sinatra::Base
+  set :views, 'views'
+  set :method_override, true
+
   def initialize
     super
     @memos = []
@@ -57,8 +60,43 @@ class App < Sinatra::Base
   get '/memos/:id/detail' do
     target_id = params['id']
     memo = @memos.find { |memo| memo.id == target_id }
+    # TODO: error handling(NOT FOUND)
     @memo = memo
     erb :'detail.html'
+  end
+
+  get '/memos/:id/edit' do
+    # TODO: error handling(NOT FOUND)
+    target_id = params['id']
+    memo = @memos.find { |memo| memo.id == target_id }
+    @memo = memo
+    erb :'edit.html'
+  end
+
+  put '/memos/:id' do
+    # TODO: error handling(NOT FOUND)
+    target_id = params['id']
+    target_memo = @memos.find { |memo| memo.id == target_id }
+
+    # TODO: 確認
+    status 404
+    @error_message = 'memo not found'
+    return erb :'index.html' if target_memo.nil?
+
+    @memo = target_memo
+    status 400
+    @error_message = 'required parameter not found'
+    return erb :'edit.html' if [params[:title], params[:content]].any?(nil)
+
+    @error_message = 'empty value not acceptable'
+    return erb :'edit.html' if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
+
+    target_memo.title = @params[:title]
+    target_memo.content = @params[:content]
+    target_memo.updated_at = Time.now
+
+    status 200
+    redirect "/memos/#{target_id}/detail"
   end
 
   get '/api/memos' do
