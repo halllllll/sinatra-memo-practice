@@ -1,10 +1,11 @@
-<section>
-  <h2>Memo list</h2>
-  <a href="/memos/new" role="button">+ memo</a>
+<section class="py-5">
+  <h2 class="text-xl">Memo list</h2>
+  <a href="/memos/new" role="button" class="btn btn-sm">+ memo</a>
+  <hr class="py-5">
   <p>
     <%= @memos.size.zero? ? "No memo created yet" : "memo count: " + @memos.size.to_s %>
   </p>
-  <div>
+  <div class="">
     <ul>
       <% @memos.each do |memo| %>
         <li>
