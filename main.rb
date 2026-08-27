@@ -22,6 +22,8 @@ class App < Sinatra::Base
     end
   end
 
+  helpers Validate
+
   before '/memos/:id/*' do
     memo_id = @params[:id]
     target_memo = memo_manager.find(memo_id)

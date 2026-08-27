@@ -1,20 +1,25 @@
 <section class="py-5">
   <h2 class="text-xl">Memo list</h2>
-  <a href="/memos/new" role="button" class="btn btn-sm">+ memo</a>
-  <hr class="py-5">
+  <hr class="my-5">
+  <div class="flex justify-end">
+    <div>
+      <a href="/memos/new" role="button" class="btn btn-sm">+ memo</a>
+    </div>
+  </div>
   <p>
     <%= @memos.size.zero? ? "No memo created yet" : "memo count: " + @memos.size.to_s %>
   </p>
-  <div class="">
-    <ul>
+  <div class="mt-3">
+    <ul role="list" class="list rounded-box">
       <% @memos.each do |memo| %>
-        <li>
-          <p>
+        <li class="list-row flex items-end justify-between">
+          <div class="text-lg ">
             <a href="/memos/<%= memo.id %>/detail"><%= memo.title %></a>
-            <span>- (last update:
-              <%= memo.updated_at.strftime("%F %H:%M") %>)
-            </span>
-          </p>
+          </div>
+          <div>- (last update:
+            <%= memo.updated_at.strftime("%F %H:%M") %>)
+          </div>
+
         </li>
       <% end %>
     </ul>

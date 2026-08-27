@@ -1,12 +1,32 @@
-<section>
-  <a href="/">back to home</a>
-  <h2>new memo</h2>
+<section class="py-5">
+  <a href="/" class="underline">back to home</a>
+  <h2 class="text-xl">new memo</h2>
+  <hr class="my-5">
+
   <p><%= @error_message %></p>
   <form action="/memos" method="post">
-    <label for="title">Title</label>
-    <input id="title" name="title" minlength="3" maxlength="10" required>
-    <label for="content">Memo</label>
-    <textarea id="content" name="content" minlength="5" maxlength="50" required></textarea>
-    <button>create</button>
+    <div class="grid grid-cols-1 gap-2">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        name="title"
+        minlength="3"
+        maxlength="10"
+        class="input"
+        required
+      >
+      <label for="content">Memo</label>
+      <textarea
+        id="content"
+        name="content"
+        minlength="5"
+        maxlength="50"
+        class="textarea"
+        required
+      ></textarea>
+    </div>
+    <div class="mt-6 flex item-center">
+      <button type="submit" class="btn">create</button>
+    </div>
   </form>
 </section>
