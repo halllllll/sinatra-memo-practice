@@ -35,11 +35,21 @@ class App < Sinatra::Base
 
   get '/' do
     @memos = memo_manager.memos
-    erb :'index.html'
+
+    erb :'index.html' do
+      @header_center = "<h2 class='text-xl'>Mmeo list</h2>"
+
+      erb :'header.html'
+    end
   end
 
   get '/memos/new' do
-    erb :'new.html'
+    erb :'new.html' do
+      @header_left = "<a href='/' class='underline'>back to home</a>"
+      @header_center = "<h2 class='text-xl'>New memo</h2>"
+
+      erb :'header.html'
+    end
   end
 
   post '/memos' do
@@ -55,7 +65,12 @@ class App < Sinatra::Base
     memo = memo_manager.find(memo_id)
     @memo = memo
 
-    erb :'detail.html'
+    erb :'detail.html' do
+      @header_left = "<a href='/' class='underline'>back to home</a>"
+      @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
+      @header_right = "<p class='text-sm text-gray-500 items-end'>last update: #{@memo.updated_at.strftime('%F %H:%M')}</p>"
+      erb :'header.html'
+    end
   end
 
   get '/memos/:id/edit' do
@@ -63,7 +78,11 @@ class App < Sinatra::Base
     memo = memo_manager.find(memo_id)
     @memo = memo
 
-    erb :'edit.html'
+    erb :'edit.html' do
+      @header_left = "<a href='/' class='underline'>back to home</a>"
+      @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
+      erb :'header.html'
+    end
   end
 
   put '/memos/:id' do
@@ -84,13 +103,5 @@ class App < Sinatra::Base
   not_found do
     @error_message = 'This is nowhere to be found.'
     erb :'error.html'
-  end
-
-  get '/info' do
-    puts response
-
-    status 418
-    headers 'Content-Type' => 'text/plain'
-    body 'I am a teapot'
   end
 end
