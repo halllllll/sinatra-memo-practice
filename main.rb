@@ -30,6 +30,7 @@ class App < Sinatra::Base
     @error_message = 'memo not found'
     @memos = memo_manager.memos
     halt 404, erb(:'index.html') unless target_memo
+    @error_message = ''
   end
 
   get '/' do
@@ -45,7 +46,7 @@ class App < Sinatra::Base
     validate_params(params, :'new.html')
     new_memo = Memo.new(params[:title], params[:content])
     memo_manager.add(new_memo)
-    status 201 # TODO: 不要？
+
     redirect '/'
   end
 
@@ -61,6 +62,7 @@ class App < Sinatra::Base
     memo_id = params['id']
     memo = memo_manager.find(memo_id)
     @memo = memo
+
     erb :'edit.html'
   end
 
@@ -76,7 +78,6 @@ class App < Sinatra::Base
     memo.content = params[:content]
     memo.updated_at = Time.now
 
-    status 200
     redirect "/memos/#{memo_id}/detail"
   end
 

@@ -1,21 +1,43 @@
-<section>
-  <a href="/">back to home</a>
-  <h2>update memo</h2>
-  <p><%= @error_message %></p>
+<section class="py-5">
+  <div class="grid grid-cols-3 items-center">
+    <div class="justify-self-start">
+      <a href="/" class="underline">back to home</a>
+    </div>
+    <div class="justify-self-center">
+      <h2 class="text-xl">update memo</h2>
+    </div>
+    <div class="justify-self-end"></div>
+  </div>
+  <hr class="my-5">
+
+  <div class="flex justify-center text-red-500">
+    <p><%= @error_message %></p>
+  </div>
   <form action="/memos/<%= @memo.id %>" method="post">
-    <label for="title">Title</label>
-    <input
-      id="title"
-      name="title"
-      value="<%= @memo.title %>"
-      minlength="3"
-      maxlength="10"
-      required
-    >
-    <label for="content">Memo</label>
-    <textarea id="content" name="content" minlength="5" maxlength="50" required><%= @memo.content %>
-    </textarea>
-    <input type="hidden" name="_method" value="put">
-    <input type="submit" value="upate">
+    <div class="grid grid-cols-1 gap-2">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        name="title"
+        minlength="3"
+        maxlength="10"
+        class="input"
+        value="<%= @memo.title %>"
+        required
+      >
+      <label for="content">Memo</label>
+      <textarea
+        id="content"
+        name="content"
+        minlength="5"
+        maxlength="50"
+        class="textarea"
+        required
+      ><%= @memo.content %></textarea>
+    </div>
+    <div class="mt-6">
+      <input type="hidden" name="_method" value="put">
+      <input type="submit" value="upate" class="btn">
+    </div>
   </form>
 </section>

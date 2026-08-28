@@ -17,13 +17,16 @@
     <%= @memos.size.zero? ? "No memo created yet" : "memo count: " + @memos.size.to_s %>
   </p>
   <div class="mt-3">
-    <ul role="list" class="list rounded-box">
+    <ul role="list" class="list">
       <% @memos.each do |memo| %>
-        <li class="list-row flex items-end justify-between">
-          <div class="text-lg ">
+        <li class="list-row flex items-center justify-between">
+          <div class="text-lg border-b-2 border-transparent hover:border-gray-500">
             <a href="/memos/<%= memo.id %>/detail"><%= memo.title %></a>
           </div>
-          <div>- last update:
+          <div class="overflow-hidden truncate flex-1 text-sm text-gray-400">
+            <%= memo.content %>
+          </div>
+          <div class="items-end">- last update:
             <%= memo.updated_at.strftime("%F %H:%M") %>
           </div>
 

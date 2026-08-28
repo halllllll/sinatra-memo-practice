@@ -12,10 +12,12 @@
     </div>
   </div>
   <hr class="my-5">
-
+  <div class="flex justify-center text-red-500">
+    <p><%= @error_message %></p>
+  </div>
   <div><%= @memo.content %></div>
   <hr class="my-5">
-  <a href="/memos/<%= @memo.id %>/edit" role="button">
+  <a href="/memos/<%= @memo.id %>/edit" role="button" class="btn">
     edit
   </a>
 </section>
