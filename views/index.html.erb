@@ -1,5 +1,12 @@
 <section class="py-5">
-  <h2 class="text-xl">Memo list</h2>
+  <div class="grid grid-cols-3 items-center">
+    <div class="justify-self-start">
+    </div>
+    <div class="justify-self-center">
+      <h2 class="text-xl">Memo list</h2>
+    </div>
+    <div class="justify-self-end"></div>
+  </div>
   <hr class="my-5">
   <div class="flex justify-end">
     <div>
@@ -16,8 +23,8 @@
           <div class="text-lg ">
             <a href="/memos/<%= memo.id %>/detail"><%= memo.title %></a>
           </div>
-          <div>- (last update:
-            <%= memo.updated_at.strftime("%F %H:%M") %>)
+          <div>- last update:
+            <%= memo.updated_at.strftime("%F %H:%M") %>
           </div>
 
         </li>
