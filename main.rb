@@ -37,7 +37,7 @@ class App < Sinatra::Base
     @memos = memo_manager.memos
 
     erb :'index.html' do
-      @header_center = "<h2 class='text-xl'>Mmeo list</h2>"
+      @header_center = "<h2 class='text-xl'>Memos</h2>"
 
       erb :'header.html'
     end
@@ -85,7 +85,7 @@ class App < Sinatra::Base
     end
   end
 
-  put '/memos/:id' do
+  patch '/memos/:id' do
     memo_id = params['id']
     memo = memo_manager.find(memo_id)
 
@@ -101,7 +101,7 @@ class App < Sinatra::Base
   end
 
   not_found do
-    @error_message = 'This is nowhere to be found.'
+    @error_message = @error_message.nil? || @error_message.empty? ? 'his is nowhere to be found.' : @error_message
     erb :'error.html'
   end
 end

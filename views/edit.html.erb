@@ -11,7 +11,7 @@
         id="title"
         name="title"
         minlength="3"
-        maxlength="10"
+        maxlength="30"
         class="input"
         value="<%= @memo.title %>"
         required
@@ -21,13 +21,13 @@
         id="content"
         name="content"
         minlength="5"
-        maxlength="50"
+        maxlength="80"
         class="textarea"
         required
       ><%= @memo.content %></textarea>
     </div>
     <div class="mt-6">
-      <input type="hidden" name="_method" value="put">
+      <input type="hidden" name="_method" value="patch">
       <input type="submit" value="upate" class="btn">
     </div>
   </form>
