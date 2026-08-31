@@ -24,12 +24,11 @@ class App < Sinatra::Base
 
   helpers Validate
 
-  before '/memos/:id/*' do
+  before '/memos/:id' do
     memo_id = @params[:id]
     target_memo = memo_manager.find(memo_id)
     @error_message = 'memo not found'
-    @memos = memo_manager.memos
-    halt 404, erb(:'index.html') unless target_memo
+    halt 404, erb(:'error.html') unless target_memo
     @error_message = ''
   end
 
@@ -98,6 +97,11 @@ class App < Sinatra::Base
     memo.updated_at = Time.now
 
     redirect "/memos/#{memo_id}/detail"
+  end
+
+  delete '/memos/:id' do
+    memo_manager.delete(params[:id])
+    redirect '/'
   end
 
   not_found do
