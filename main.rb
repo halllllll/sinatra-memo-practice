@@ -24,8 +24,8 @@ class App < Sinatra::Base
 
   helpers Validate
 
-  before '/memos/:id' do
-    memo_id = @params[:id]
+  before %r{/memos/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})} do
+    memo_id = @params['captures'].first
     target_memo = memo_manager.find(memo_id)
     @error_message = 'memo not found'
     halt 404, erb(:'error.html') unless target_memo

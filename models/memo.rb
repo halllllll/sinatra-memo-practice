@@ -7,7 +7,6 @@ class MemoManager
     @memos = []
   end
 
-  # TODO: title,contentを受取り、ここでMemoをnewする？
   def add(memo)
     @memos << memo
   end
