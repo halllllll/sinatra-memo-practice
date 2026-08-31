@@ -19,7 +19,7 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 ```sh
 bundle exec puma config.ru -p 4567
 ```
-to change port (default `4567`) with `-p` option.
+to change port (default `9292`) with `-p` option.
 
 
 [!NOTE]
@@ -31,7 +31,7 @@ bundle exec erb_lint --lint-all
 ```
 
 ## API
-
+REST ベースの API エンドポイントがあります。
 
 ### Response
 
@@ -64,10 +64,16 @@ or, Error response with message
 |created_at|datetime||
 |updated_at|datetime||
 
-### GET /memos
-List memos.
+### GET /api/memos
+List all memos.
+```sh
+curl localhost:4567/api/memos
+```
+
+You will get response bellow when request is succeeded.
 ```json
 {
+  "result": "success",
   "body": [
     {
       "id": "00000",
@@ -87,24 +93,20 @@ List memos.
 }
 ```
 
-### POST /memos
+### POST /api/memos
 Create a new memo.
-```
-Content-Type: application/json
-
-{
-  "title": "memo title",
-  "content": "...."
-}
+```sh
+# simple example
+curl -vL -d 'title=this is new title&content=this is new content' localhost:4567/api/memos
 ```
 
-### GET /memos/\{:memo_id\}
+### GET /api/memos/\{:memo_id\}
 Get a memo.
 
-### PUT /memos/\{:memo_id\}
+### PATCH /api/memos/\{:memo_id\}
 Update an exists memo.
 
-### DELETE /memos/\{:memo_id\}
+### DELETE /api/memos/\{:memo_id\}
 Delete a memo
 
 ## References
