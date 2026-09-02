@@ -3,7 +3,6 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'time'
-require 'securerandom'
 
 require_relative 'route/api'
 require_relative 'models/memo'
@@ -53,7 +52,7 @@ class App < Sinatra::Base
 
   post '/memos' do
     validate_params(params, :'new.html')
-    new_memo = Memo.new(params[:title], params[:content])
+    new_memo = Memo.new(title: params[:title], content: params[:content])
     memo_manager.add(new_memo)
 
     redirect '/'
@@ -85,18 +84,16 @@ class App < Sinatra::Base
   end
 
   patch '/memos/:id' do
-    memo_id = params['id']
-    memo = memo_manager.find(memo_id)
-
-    @memo = memo
+    memo = memo_manager.find(params['id'])
 
     validate_params(params, :'edit.html')
 
-    memo.title = params[:title]
-    memo.content = params[:content]
-    memo.updated_at = Time.now
+    edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: memo.created_at, updated_at: Time.now)
 
-    redirect "/memos/#{memo_id}/detail"
+    memo_manager.update(edited_memo)
+
+    @memo = edited_memo
+    redirect "/memos/#{params['id']}/detail"
   end
 
   delete '/memos/:id' do
@@ -105,7 +102,7 @@ class App < Sinatra::Base
   end
 
   not_found do
-    @error_message = @error_message.nil? || @error_message.empty? ? 'his is nowhere to be found.' : @error_message
+    @error_message = @error_message.nil? || @error_message.empty? ? 'This is nowhere to be found.' : @error_message
     erb :'error.html'
   end
 end

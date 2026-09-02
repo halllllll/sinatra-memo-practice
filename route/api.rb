@@ -27,7 +27,7 @@ class ApiRoute < Sinatra::Base
     json({ result: 'success', body: memo.to_json })
   end
 
-  put '/api/memos/:id' do
+  patch '/api/memos/:id' do
     memo_id = params[:id]
     memo = @memo_manager.find(memo_id)
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
@@ -36,6 +36,8 @@ class ApiRoute < Sinatra::Base
     memo.title = params[:title]
     memo.content = params[:content]
     memo.updated_at = Time.now
+
+    @memo_manager.update(memo)
 
     status 204
   end

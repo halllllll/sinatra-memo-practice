@@ -15,3 +15,5 @@ gem 'puma', '~> 8.0'
 gem 'rackup', '~> 2.3'
 gem 'sinatra', '~> 4.2'
 gem 'sinatra-contrib', '~> 4.2'
+
+gem "csv", "~> 3.3"
