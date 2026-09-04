@@ -158,6 +158,7 @@ DEPENDENCIES
   erb_lint (~> 0.9.0)
   herb
   puma (~> 8.0)
+  rack-protection (~> 4.2)
   rack-unreloader (~> 2.1)
   rackup (~> 2.3)
   rubocop-fjord

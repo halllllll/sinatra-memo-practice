@@ -2,17 +2,24 @@
 
 require 'sinatra'
 require 'sinatra/json'
+require 'rack/protection'
 require 'time'
 
 require_relative 'route/api'
 require_relative 'models/memo'
 require_relative 'helpers/validate'
-# set :show_exceptions, false
+
+set :show_exceptions, false
 
 class App < Sinatra::Base
   set :method_override, true
   set :memo_manager, MemoManager.new
 
+  use Rack::Protection::EscapedParams
+  use Rack::Protection::ContentSecurityPolicy,
+    default_src: "'self'",
+    script_src: "'self' https://cdn.jsdelivr.net",
+    style_src: "'self' https://cdn.jsdelivr.net 'unsafe-inline'"
   use ApiRoute, settings.memo_manager
 
   helpers do
@@ -23,17 +30,16 @@ class App < Sinatra::Base
 
   helpers Validate
 
-  before %r{/memos/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})} do
+  before %r{/memos/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})(?:/.*)?} do
     memo_id = @params['captures'].first
-    target_memo = memo_manager.find(memo_id)
-    @error_message = 'memo not found'
-    halt 404, erb(:'error.html') unless target_memo
-    @error_message = ''
+    @memo = memo_manager.find(memo_id)
+    halt 404 unless @memo
   end
 
   get '/' do
     @memos = memo_manager.memos
 
+    content_type :html
     erb :'index.html' do
       @header_center = "<h2 class='text-xl'>Memos</h2>"
 
@@ -42,6 +48,7 @@ class App < Sinatra::Base
   end
 
   get '/memos/new' do
+    content_type :html
     erb :'new.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
       @header_center = "<h2 class='text-xl'>New memo</h2>"
@@ -59,10 +66,10 @@ class App < Sinatra::Base
   end
 
   get '/memos/:id/detail' do
-    memo_id = params['id']
-    memo = memo_manager.find(memo_id)
-    @memo = memo
+    if @memo.nil?
 
+    end
+    content_type :html
     erb :'detail.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
       @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
@@ -72,10 +79,7 @@ class App < Sinatra::Base
   end
 
   get '/memos/:id/edit' do
-    memo_id = params['id']
-    memo = memo_manager.find(memo_id)
-    @memo = memo
-
+    content_type :html
     erb :'edit.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
       @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
@@ -84,11 +88,9 @@ class App < Sinatra::Base
   end
 
   patch '/memos/:id' do
-    memo = memo_manager.find(params['id'])
-
     validate_params(params, :'edit.html')
 
-    edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: memo.created_at, updated_at: Time.now)
+    edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: @memo.created_at, updated_at: Time.now)
 
     memo_manager.update(edited_memo)
 
@@ -102,7 +104,7 @@ class App < Sinatra::Base
   end
 
   not_found do
-    @error_message = @error_message.nil? || @error_message.empty? ? 'This is nowhere to be found.' : @error_message
+    @error_message ||= "Not found."
     erb :'error.html'
   end
 end

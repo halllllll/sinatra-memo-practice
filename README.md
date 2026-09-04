@@ -58,7 +58,7 @@ or, Error response with message
 
 |Parameter|Type|Desc|
 |--|--|--|
-|id|int||
+|id|int|UUID v4|
 |title|string||
 |content|string|memo content|
 |created_at|datetime||
@@ -104,7 +104,12 @@ curl -vL -d 'title=this is new title&content=this is new content' localhost:4567
 Get a memo.
 
 ### PATCH /api/memos/\{:memo_id\}
-Update an exists memo.
+Update an exists memo. Parameter `title` and `content` are both required.
+```sh
+curl -X PATCH \
+  -vL -d 'title=update title&content=update content'\
+  http://localhost:4567/api/memos/:memo_id
+```
 
 ### DELETE /api/memos/\{:memo_id\}
 Delete a memo
