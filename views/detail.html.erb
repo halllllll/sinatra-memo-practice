@@ -8,23 +8,7 @@
   <a href="/memos/<%= @memo.id %>/edit" role="button" class="btn">
     edit
   </a>
-  <!-- You can open the modal using ID.showModal() method --> <!--<button class="btn btn-error" onclick="delete_confirm_modal.showModal()">delete</button>--> <!-- onclick属性 → popovertarget属性に置き換え -->
   <button class="btn btn-error" popovertarget="delete_confirm_modal">delete</button>
-  <!--<dialog id="delete_confirm_modal" class="modal">
-    <div class="modal-box">
-      <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-      </form>
-      <h3 class="text-lg font-bold">Caution</h3>
-      <p class="py-4">This action cannot be undone.</p>
-      <form action="/memos/<%= @memo.id %>" method="post">
-        <div class="mt-6 flex justify-center">
-          <input type="hidden" name="_method" value="delete">
-          <input type="submit" value="delete" class="btn btn-error">
-        </div>
-      </form>
-    </div>
-  </dialog>--> <!-- dialog → popover付きdivへ -->
   <div id="delete_confirm_modal" class="modal"
     popover>
     <div class="modal-box">
@@ -32,8 +16,7 @@
         <button
           class="btn btn-sm btn-circle btn-ghost"
           popovertarget="delete_confirm_modal"
-          popovertargetaction="hide"
-        >✕</button>
+          popovertargetaction="hide">✕</button>
       </div>
       <h3 class="text-lg font-bold">Caution</h3>
       <p class="py-4">This action cannot be undone.</p>

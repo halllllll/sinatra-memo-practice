@@ -14,8 +14,7 @@
         maxlength="30"
         class="input"
         value="<%= @memo.title %>"
-        required
-      >
+        required>
       <label for="content">Memo</label>
       <textarea
         id="content"
@@ -23,8 +22,7 @@
         minlength="5"
         maxlength="80"
         class="textarea"
-        required
-      ><%= @memo.content %></textarea>
+        required><%= @memo.content %></textarea>
     </div>
     <div class="mt-6">
       <input type="hidden" name="_method" value="patch">
