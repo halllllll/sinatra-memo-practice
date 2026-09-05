@@ -14,16 +14,17 @@ class ApiRoute < Sinatra::Base
     halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
     halt 400, json({ result: 'error', message: 'empty value not acceptable' }) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
 
-    new_memo = Memo.new(params[:title], params[:content])
+    new_memo = Memo.new(title: params[:title], content: params[:content])
     @memo_manager.add(new_memo)
 
-    redirect '/api/memos'
+    status 201
+    json({ result: 'success', body: new_memo.to_json })
   end
 
   get '/api/memos/:id' do
     memo_id = params[:id]
     memo = @memo_manager.find(memo_id)
-
+    halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
     json({ result: 'success', body: memo.to_json })
   end
 
