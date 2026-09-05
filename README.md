@@ -9,9 +9,11 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 ## Setup
 1. clone this repository
     - `git clone`
-2. prepare Ruby env
+2. switch　to the `dev` branch to test the latest implementation
+    - `git checkout -b dev origin/dev`
+3. prepare Ruby environment
     - `rbenv install`
-3. install gems
+4. install gems
     - `bundle install`
 
 ## Commands
@@ -28,12 +30,12 @@ Puma's default port is `9292`; use `-p` to specify a different port.
 
 
 ### Lint / Format
-- using `erb_lint`
+- Run `erb_lint`
 ```sh
 bundle exec erb_lint --lint-all
 ```
 
-- using `rubocop`, rule: `.rubocop.yml`
+- Run `rubocop` (config: `.rubocop.yml`)
 ```sh
 bundle exec rubocop
 ```
@@ -148,8 +150,19 @@ Delete a memo. Returns `204 No Content` on success, `404` if the memo does not e
 
 ```sh
 curl -v -X DELETE \
-  localhost:4567/memos/1eae8de8-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  localhost:4567/api/memos/1eae8de8-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
+
+## Troubleshooting
+
+### bundle install error: **The running version of Bundler (4.0.x) does not match the version of the specification installed for it (4.0.10).**
+This is caused by a version mismatch between `bundler` and `Gemfile.lock`. Align your bundler version with the lock file:
+
+```sh
+gem install bundler:4.0.10
+bundle install
+```
+
 
 ## References
 - sinatra [Command Line](https://github.com/sinatra/sinatra#command-line)
