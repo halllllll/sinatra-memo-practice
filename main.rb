@@ -17,9 +17,9 @@ class App < Sinatra::Base
 
   use Rack::Protection::EscapedParams
   use Rack::Protection::ContentSecurityPolicy,
-    default_src: "'self'",
-    script_src: "'self' https://cdn.jsdelivr.net",
-    style_src: "'self' https://cdn.jsdelivr.net 'unsafe-inline'"
+      default_src: "'self'",
+      script_src: "'self' https://cdn.jsdelivr.net",
+      style_src: "'self' https://cdn.jsdelivr.net 'unsafe-inline'"
   use ApiRoute, settings.memo_manager
 
   helpers do
@@ -66,9 +66,6 @@ class App < Sinatra::Base
   end
 
   get '/memos/:id/detail' do
-    if @memo.nil?
-
-    end
     content_type :html
     erb :'detail.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
@@ -104,7 +101,7 @@ class App < Sinatra::Base
   end
 
   not_found do
-    @error_message ||= "Not found."
+    @error_message ||= 'Not found.'
     erb :'error.html'
   end
 end

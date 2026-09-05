@@ -1,23 +1,29 @@
 # frozen_string_literal: true
+
 require 'csv'
 require 'securerandom'
 
 DATA_FILE = 'memos.csv'
 
 class MemoManager
-
   def initialize
-    unless File.exist?(DATA_FILE)
-      CSV.open(DATA_FILE, 'w') do |csv|
-        csv << ['id','title','content','created_at','updated_at']
-      end
+    return if File.exist?(DATA_FILE)
+
+    CSV.open(DATA_FILE, 'w') do |csv|
+      csv << %w[id title content created_at updated_at]
     end
   end
 
   def memos
     memo_arr = []
     CSV.foreach(DATA_FILE, headers: true) do |row|
-      memo = Memo.new(id: row['id'], title: row['title'], content: row['content'], created_at: Time.strptime(row['created_at'],'%Y-%m-%d %H:%M:%S'), updated_at: Time.strptime(row['updated_at'],'%Y-%m-%d %H:%M:%S'))
+      memo = Memo.new(
+        id: row['id'],
+        title: row['title'],
+        content: row['content'],
+        created_at: Time.strptime(row['created_at'], '%Y-%m-%d %H:%M:%S'),
+        updated_at: Time.strptime(row['updated_at'], '%Y-%m-%d %H:%M:%S')
+      )
       memo_arr << memo
     end
     memo_arr
@@ -30,11 +36,11 @@ class MemoManager
   def update(memo)
     memo_table = CSV.read(DATA_FILE, headers: true)
     memo_table.each do |row|
-      if memo.id == row['id']
-       row['title'] = memo.title
-       row['content'] = memo.content
-       row['updated_at'] = memo.updated_at
-      end
+      next if memo.id != row['id']
+
+      row['title'] = memo.title
+      row['content'] = memo.content
+      row['updated_at'] = memo.updated_at
     end
     CSV.open(DATA_FILE, 'w') do |csv|
       csv << memo_table.headers
@@ -55,7 +61,6 @@ class MemoManager
       csv << memo_table.headers
       memo_table.each { |row| csv << row }
     end
-
   end
 end
 
@@ -64,12 +69,12 @@ class Memo
   attr_reader :id, :created_at
 
   def initialize(
-      title:,
-      content:,
-      id: SecureRandom.uuid,
-      created_at: Time.now,
-      updated_at: Time.now
-    )
+    title:,
+    content:,
+    id: SecureRandom.uuid,
+    created_at: Time.now,
+    updated_at: Time.now
+  )
     @id = id
     @title = title
     @content = content
