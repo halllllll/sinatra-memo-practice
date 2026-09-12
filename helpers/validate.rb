@@ -2,7 +2,6 @@
 
 module Validate
   def validate_params(params, origin_page)
-    status 400
     @error_message = 'required parameter not found'
     halt 400, erb(origin_page) if [params[:title], params[:content]].any?(nil)
 
