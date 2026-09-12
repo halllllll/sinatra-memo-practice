@@ -26,7 +26,7 @@ class MemoManager
   end
 
   def add(memo)
-    CSV.open(DATA_FILE, 'a') { |csv| csv << memo.to_array }
+    CSV.open(DATA_FILE, 'a') { |csv| csv << memo.to_a }
   end
 
   def update(memo)
@@ -78,7 +78,7 @@ class Memo
     @updated_at = updated_at
   end
 
-  def to_array
+  def to_a
     [id, title, content, created_at, updated_at]
   end
 
