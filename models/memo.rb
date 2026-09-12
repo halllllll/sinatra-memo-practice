@@ -4,6 +4,7 @@ require 'csv'
 require 'securerandom'
 
 DATA_FILE = 'memos.csv'
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 class MemoManager
   def initialize
@@ -15,18 +16,13 @@ class MemoManager
   end
 
   def memos
-    memo_arr = []
-    CSV.foreach(DATA_FILE, headers: true) do |row|
-      memo = Memo.new(
-        id: row['id'],
-        title: row['title'],
-        content: row['content'],
-        created_at: Time.strptime(row['created_at'], '%Y-%m-%d %H:%M:%S'),
-        updated_at: Time.strptime(row['updated_at'], '%Y-%m-%d %H:%M:%S')
+    CSV.foreach(DATA_FILE, headers: true, header_converters: :symbol).map do |row|
+      Memo.new(
+        **row.to_h.slice(:id, :title, :content),
+        created_at: Time.strptime(row[:created_at], DATE_FORMAT),
+        updated_at: Time.strptime(row[:updated_at], DATE_FORMAT)
       )
-      memo_arr << memo
     end
-    memo_arr
   end
 
   def add(memo)
@@ -34,13 +30,13 @@ class MemoManager
   end
 
   def update(memo)
-    memo_table = CSV.read(DATA_FILE, headers: true)
+    memo_table = CSV.read(DATA_FILE, headers: true, header_converters: :symbol)
     memo_table.each do |row|
-      next if memo.id != row['id']
+      next if memo.id != row[:id]
 
-      row['title'] = memo.title
-      row['content'] = memo.content
-      row['updated_at'] = memo.updated_at
+      row[:title] = memo.title
+      row[:content] = memo.content
+      row[:updated_at] = memo.updated_at
     end
     CSV.open(DATA_FILE, 'w') do |csv|
       csv << memo_table.headers
@@ -53,9 +49,9 @@ class MemoManager
   end
 
   def delete(memo_id)
-    memo_table = CSV.read(DATA_FILE, headers: true)
+    memo_table = CSV.read(DATA_FILE, headers: true, header_converters: :symbol)
     memo_table.delete_if do |row|
-      memo_id == row['id']
+      memo_id == row[:id]
     end
     CSV.open(DATA_FILE, 'w') do |csv|
       csv << memo_table.headers
