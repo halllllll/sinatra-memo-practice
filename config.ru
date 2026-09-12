@@ -12,6 +12,5 @@ Unreloader = Rack::Unreloader.new(
 Unreloader.require './models/memo.rb'
 Unreloader.require './route/api.rb'
 Unreloader.require './main.rb'
-Unreloader.require './helpers/init.rb'
 
 run Unreloader
