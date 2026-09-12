@@ -13,31 +13,24 @@ set :show_exceptions, false
 
 class App < Sinatra::Base
   set :method_override, true
-  set :memo_manager, MemoManager.new
 
   use Rack::Protection::EscapedParams
   use Rack::Protection::ContentSecurityPolicy,
       default_src: "'self'",
       script_src: "'self' https://cdn.jsdelivr.net",
       style_src: "'self' https://cdn.jsdelivr.net 'unsafe-inline'"
-  use ApiRoute, settings.memo_manager
-
-  helpers do
-    def memo_manager
-      settings.memo_manager
-    end
-  end
+  use ApiRoute
 
   helpers Validate
 
   before %r{/memos/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})(?:/.*)?} do
     memo_id = @params['captures'].first
-    @memo = memo_manager.find(memo_id)
+    @memo = Memo.find(memo_id)
     halt 404 unless @memo
   end
 
   get '/' do
-    @memos = memo_manager.memos
+    @memos = Memo.all
 
     content_type :html
     erb :'index.html' do
@@ -60,7 +53,7 @@ class App < Sinatra::Base
   post '/memos' do
     validate_params(params, :'new.html')
     new_memo = Memo.new(title: params[:title], content: params[:content])
-    memo_manager.add(new_memo)
+    Memo.add(new_memo)
 
     redirect '/'
   end
@@ -89,14 +82,14 @@ class App < Sinatra::Base
 
     edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: @memo.created_at, updated_at: Time.now)
 
-    memo_manager.update(edited_memo)
+    Memo.update(edited_memo)
 
     @memo = edited_memo
     redirect "/memos/#{params['id']}/detail"
   end
 
   delete '/memos/:id' do
-    memo_manager.delete(params[:id])
+    Memo.delete(params[:id])
     redirect '/'
   end
 
