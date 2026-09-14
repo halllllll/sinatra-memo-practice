@@ -13,10 +13,10 @@
       <% @memos.each do |memo| %>
         <li class="list-row flex items-center justify-between">
           <div class="text-lg border-b-2 border-transparent hover:border-gray-500">
-            <a href="/memos/<%= memo.id %>/detail"><%= memo.title %></a>
+            <a href="/memos/<%= memo.id %>/detail"><%= h memo.title %></a>
           </div>
           <div class="overflow-hidden truncate flex-1 text-sm text-gray-400">
-            <%= memo.content %>
+            <%= h memo.content %>
           </div>
           <div class="items-end">- last update:
             <%= memo.updated_at.strftime("%F %H:%M") %>

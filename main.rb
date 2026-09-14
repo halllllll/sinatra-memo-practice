@@ -14,7 +14,6 @@ set :show_exceptions, false
 class App < Sinatra::Base
   set :method_override, true
 
-  use Rack::Protection::EscapedParams
   use Rack::Protection::ContentSecurityPolicy,
       default_src: "'self'",
       script_src: "'self' https://cdn.jsdelivr.net",
@@ -22,6 +21,12 @@ class App < Sinatra::Base
   use ApiRoute
 
   helpers Validate
+
+  helpers do
+    def h(text)
+      Rack::Utils.escape_html(text)
+    end
+  end
 
   before %r{/memos/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})(?:/.*)?} do
     memo_id = @params['captures'].first
@@ -62,7 +67,7 @@ class App < Sinatra::Base
     content_type :html
     erb :'detail.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
-      @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
+      @header_center = "<h2 class='text-xl'>#{h @memo.title}</h2>"
       @header_right = "<p class='text-sm text-gray-500 items-end'>last update: #{@memo.updated_at.strftime('%F %H:%M')}</p>"
       erb :'header.html'
     end
@@ -72,7 +77,7 @@ class App < Sinatra::Base
     content_type :html
     erb :'edit.html' do
       @header_left = "<a href='/' class='underline'>back to home</a>"
-      @header_center = "<h2 class='text-xl'>#{@memo.title}</h2>"
+      @header_center = "<h2 class='text-xl'>#{h @memo.title}</h2>"
       erb :'header.html'
     end
   end
