@@ -1,0 +1,29 @@
+<section class="py-5">
+  <%= yield %>
+  <div class="flex justify-end">
+    <div>
+      <a href="/memos/new" role="button" class="btn btn-sm">+ memo</a>
+    </div>
+  </div>
+  <p>
+    <%= @memos.size.zero? ? "No memos yet." : "memo count: " + @memos.size.to_s %>
+  </p>
+  <div class="mt-3">
+    <ul role="list" class="list">
+      <% @memos.each do |memo| %>
+        <li class="list-row flex items-center justify-between">
+          <div class="text-lg border-b-2 border-transparent hover:border-gray-500">
+            <a href="/memos/<%= memo.id %>/detail"><%= h memo.title %></a>
+          </div>
+          <div class="overflow-hidden truncate flex-1 text-sm text-gray-400">
+            <%= h memo.content %>
+          </div>
+          <div class="items-end">- last update:
+            <%= memo.updated_at.strftime("%F %H:%M") %>
+          </div>
+
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</section>

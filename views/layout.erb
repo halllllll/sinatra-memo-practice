@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Sinatra Memo App</title>
+  </head>
+  <body class=" bg-base-100 text-base-content font-sans min-h-screen max-w-md">
+    <div class="w-3xl">
+      <article class="container mx-auto p-4">
+        <h1 class="text-2xl">Memo App</h1>
+        <%= yield %>
+      </article>
+    </div>
+  </body>
+</html>

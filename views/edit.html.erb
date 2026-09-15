@@ -1,0 +1,32 @@
+<section class="py-5">
+  <%= yield %>
+
+  <div class="flex justify-center text-red-500">
+    <p><%= @error_message %></p>
+  </div>
+  <form action="/memos/<%= @memo.id %>" method="post">
+    <div class="grid grid-cols-1 gap-2">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        name="title"
+        minlength="3"
+        maxlength="30"
+        class="input"
+        value="<%= h @memo.title %>"
+        required>
+      <label for="content">Memo</label>
+      <textarea
+        id="content"
+        name="content"
+        minlength="5"
+        maxlength="80"
+        class="textarea"
+        required><%= h @memo.content %></textarea>
+    </div>
+    <div class="mt-6">
+      <input type="hidden" name="_method" value="patch">
+      <input type="submit" value="update" class="btn">
+    </div>
+  </form>
+</section>

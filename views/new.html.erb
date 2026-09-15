@@ -1,0 +1,30 @@
+<section class="py-5">
+  <%= yield %>
+
+  <div class="flex justify-center text-red-500">
+    <p><%= @error_message %></p>
+  </div>
+  <form action="/memos" method="post">
+    <div class="grid grid-cols-1 gap-2">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        name="title"
+        minlength="3"
+        maxlength="30"
+        class="input"
+        required>
+      <label for="content">Memo</label>
+      <textarea
+        id="content"
+        name="content"
+        minlength="5"
+        maxlength="80"
+        class="textarea"
+        required></textarea>
+    </div>
+    <div class="mt-6">
+      <input type="submit" value="create" class="btn">
+    </div>
+  </form>
+</section>
