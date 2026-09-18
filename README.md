@@ -5,27 +5,65 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 - Bundler
 - rbenv
 - rubocop
+- PostgreSQL
 
 ## Setup
+this sample app uses the following database properties:
+
+  |property||
+  |--|--|
+  |host|localhost|
+  |port|5678 (**NOT** the default 5432)|
+  |dbname|memo_db|
+  |user|memo_app|
+  |password|memo_pass|
+---
+
 1. clone this repository
     - `git clone`
-2. switch　to the `dev` branch to test the latest implementation
+2. switch to the `dev` branch to test the latest implementation
     - `git checkout -b dev origin/dev`
 3. prepare Ruby environment
     - `rbenv install`
 4. install gems
     - `bundle install`
+5. create `PGDATA` directory with password authentication.
+    ```sh
+    initdb --encoding=UTF8 --no-locale -A scram-sha-256 -D ./db/pg-data -W
+    ```
+    > [!NOTE] you will be prompted to set the database `superuser` password.
+
+6. start the PostgreSQL server on port `5678`. (logs are written to `db/memo.log`):
+    ```sh
+    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678" start
+    ```
+
+7. create a database role for this app
+    ```sh
+    createuser -h localhost -p 5678 memo_app -d -P -e
+    ```
+
+    then enter the passwords when prompted:
+    ```text
+    Enter password for new role: (enter "memo_pass" for this sample)
+    Enter it again: (enter "memo_pass" for this sample)
+    Password: (superuser password)
+    ```
+8. create the database
+    ```sh
+    createdb -h localhost -p 5678 -O memo_app memo_db -e
+    ```
 
 ## Commands
 
-### Run App
+### Run the App
+On startup, the app runs `pg/init.sql` to create the `memos` table if it does not exit.
 ```sh
 bundle exec puma config.ru -p 4567
 ```
 Visit [http://localhost:4567/](http://localhost:4567/).
 
-Memos are stored in `memos.csv` in the project root. It is created automatically if it does not exist.
-
+Memos are stored in the `memo_db` PostgreSQL dtabase.
 Puma's default port is `9292`; use `-p` to specify a different port.
 
 
@@ -39,6 +77,20 @@ bundle exec erb_lint --lint-all
 ```sh
 bundle exec rubocop
 ```
+### Connect to the database with psql
+```sh
+psql -h localhost -p 5678 -U memo_app -d memo_db
+```
+
+### Cleanup the database
+First, stop the db server:
+```sh
+pg_ctl -D ./db/pg-data stop
+```
+
+then remove the `db/pg-data` directory and the log file. This also removes all roles, including memo_app.
+
+
 
 ## Web UI Screenshot
 ### Home

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../db/db'
+
 class ApiRoute < Sinatra::Base
   get '/api/memos' do
     json({ result: 'success', body: Memo.all.map(&:to_json) })
@@ -39,7 +41,7 @@ class ApiRoute < Sinatra::Base
   end
 
   delete '/api/memos/:id' do
-    memo_id = params['id']
+    memo_id = params[:id]
     memo = Memo.find(memo_id)
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
     Memo.delete(memo.id)

@@ -5,6 +5,7 @@ require 'sinatra/json'
 require 'rack/protection'
 require 'time'
 
+require_relative 'db/db'
 require_relative 'route/api'
 require_relative 'models/memo'
 require_relative 'helpers/validate'
@@ -12,6 +13,9 @@ require_relative 'helpers/validate'
 set :show_exceptions, false
 
 class App < Sinatra::Base
+  extend DB
+  configure { DB.connect! }
+
   set :method_override, true
 
   use Rack::Protection::ContentSecurityPolicy,

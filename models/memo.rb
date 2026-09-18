@@ -36,11 +36,11 @@ class Memo
 
   class << self
     def all
-      ensure_memo_file
-
-      CSV.foreach(DATA_FILE, headers: true, header_converters: :symbol).map do |row|
+      result = DB.conn.exec('SELECT * FROM memos')
+      result.field_name_type = :symbol
+      result.map do |row|
         Memo.new(
-          **row.to_h.slice(:id, :title, :content),
+          **row.slice(:id, :title, :content),
           created_at: Time.strptime(row[:created_at], DATE_FORMAT),
           updated_at: Time.strptime(row[:updated_at], DATE_FORMAT)
         )
@@ -48,51 +48,28 @@ class Memo
     end
 
     def add(memo)
-      ensure_memo_file
-
-      CSV.open(DATA_FILE, 'a') { |csv| csv << memo.to_a }
+      DB.conn.exec_params('INSERT INTO memos(title, content) VALUES($1, $2)', [memo.title, memo.content])
     end
 
     def update(memo)
-      ensure_memo_file
-
-      memo_table = CSV.read(DATA_FILE, headers: true, header_converters: :symbol)
-      memo_table.each do |row|
-        next if memo.id != row[:id]
-
-        row[:title] = memo.title
-        row[:content] = memo.content
-        row[:updated_at] = memo.updated_at
-      end
-      CSV.open(DATA_FILE, 'w') do |csv|
-        csv << memo_table.headers
-        memo_table.each { |row| csv << row }
-      end
+      DB.conn.exec_params('UPDATE memos SET title = $2, content = $3, updated_at = $4 WHERE id = $1', [memo.id, memo.title, memo.content, memo.updated_at])
     end
 
     def find(memo_id)
-      all.find { |memo| memo.id == memo_id }
+      result = DB.conn.exec_params('SELECT * FROM memos WHERE id = $1', [memo_id])
+      return nil if result.ntuples.zero?
+
+      result.field_name_type = :symbol
+      row = result.first
+      Memo.new(
+        **row.slice(:id, :title, :content),
+        created_at: Time.strptime(row[:created_at], DATE_FORMAT),
+        updated_at: Time.strptime(row[:updated_at], DATE_FORMAT)
+      )
     end
 
     def delete(memo_id)
-      memo_table = CSV.read(DATA_FILE, headers: true, header_converters: :symbol)
-      memo_table.delete_if do |row|
-        memo_id == row[:id]
-      end
-      CSV.open(DATA_FILE, 'w') do |csv|
-        csv << memo_table.headers
-        memo_table.each { |row| csv << row }
-      end
-    end
-
-    private
-
-    def ensure_memo_file
-      return if File.exist?(DATA_FILE)
-
-      CSV.open(DATA_FILE, 'w') do |csv|
-        csv << %w[id title content created_at updated_at]
-      end
+      DB.conn.exec_params('DELETE FROM memos WHERE id = $1', [memo_id])
     end
   end
 end
