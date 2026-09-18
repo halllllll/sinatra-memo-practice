@@ -19,3 +19,5 @@ gem 'sinatra-contrib', '~> 4.2'
 gem 'csv', '~> 3.3'
 
 gem 'rack-protection', '~> 4.2'
+
+gem 'pg', '~> 1.6'
