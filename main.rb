@@ -3,8 +3,8 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'rack/protection'
-require 'time'
 
+require_relative 'db/db'
 require_relative 'route/api'
 require_relative 'models/memo'
 require_relative 'helpers/validate'
@@ -12,6 +12,9 @@ require_relative 'helpers/validate'
 set :show_exceptions, false
 
 class App < Sinatra::Base
+  extend DB
+  configure { DB.connect! }
+
   set :method_override, true
 
   use Rack::Protection::ContentSecurityPolicy,
@@ -57,8 +60,8 @@ class App < Sinatra::Base
 
   post '/memos' do
     validate_params(params, :'new.html')
-    new_memo = Memo.new(title: params[:title], content: params[:content])
-    Memo.add(new_memo)
+
+    Memo.add(title: params[:title], content: params[:content])
 
     redirect '/'
   end
@@ -85,11 +88,8 @@ class App < Sinatra::Base
   patch '/memos/:id' do
     validate_params(params, :'edit.html')
 
-    edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: @memo.created_at, updated_at: Time.now)
+    Memo.update(id: params[:id], title: params[:title], content: params[:content])
 
-    Memo.update(edited_memo)
-
-    @memo = edited_memo
     redirect "/memos/#{params['id']}/detail"
   end
 

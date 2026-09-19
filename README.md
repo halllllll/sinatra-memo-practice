@@ -5,27 +5,73 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 - Bundler
 - rbenv
 - rubocop
+- PostgreSQL **server** tools (`initdb`, `pg_ctl`) plus client tools (`psql`, `createuser`)
 
 ## Setup
+this sample app uses the following database settings:
+
+  |property||
+  |--|--|
+  |host|localhost|
+  |port|5678 (**NOT** the default 5432)|
+  |dbname|memo_db|
+  |user|memo_app|
+  |password|memo_pass|
+
+
+the database schema is defined in: [db/init.sql](./db/init.sql)
+
+---
+
 1. clone this repository
     - `git clone`
-2. switch　to the `dev` branch to test the latest implementation
+2. switch to the `dev` branch to test the latest implementation
     - `git checkout -b dev origin/dev`
 3. prepare Ruby environment
     - `rbenv install`
+    - if the command above fails, please refer to the official documentation: [rbenv/ruby-build/wiki#suggested-build-environment](https://github.com/rbenv/ruby-build/wiki#suggested-build-environment)
 4. install gems
     - `bundle install`
+5. create `PGDATA` directory with password authentication.
+ 
+    on Debian / Ubuntu, this step and the next need adjustments - see: [Troubleshooting - PostgreSQL setup on Debian / Ubuntu](#postgresql-setup-on-debian-or-ubuntu)
+
+    ```sh
+    initdb --encoding=UTF8 --no-locale -A scram-sha-256 -D ./db/pg-data -W
+    ```
+    > [!NOTE] you will be prompted to set the database `superuser` password.
+
+6. start the PostgreSQL server on port `5678`. (logs are written to `db/memo.log`):
+    ```sh
+    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678 -k /tmp" start
+    ```
+
+7. create a database role for this app
+    ```sh
+    createuser -h localhost -p 5678 memo_app -d -P -e
+    ```
+
+    then enter the passwords when prompted:
+    ```text
+    Enter password for new role: (enter "memo_pass" for this sample)
+    Enter it again: (enter "memo_pass" for this sample)
+    Password: (superuser password)
+    ```
+8. create the database
+    ```sh
+    createdb -h localhost -p 5678 -O memo_app memo_db -e
+    ```
 
 ## Commands
 
-### Run App
+### Run the App
+On startup, the app runs `db/init.sql` to create the `memos` table if it does not exist.
 ```sh
 bundle exec puma config.ru -p 4567
 ```
 Visit [http://localhost:4567/](http://localhost:4567/).
 
-Memos are stored in `memos.csv` in the project root. It is created automatically if it does not exist.
-
+Memos are stored in the `memo_db` PostgreSQL database.
 Puma's default port is `9292`; use `-p` to specify a different port.
 
 
@@ -39,6 +85,20 @@ bundle exec erb_lint --lint-all
 ```sh
 bundle exec rubocop
 ```
+### Connect to the database with psql
+```sh
+psql -h localhost -p 5678 -U memo_app -d memo_db
+```
+
+### Cleanup the database
+First, stop the db server:
+```sh
+pg_ctl -D ./db/pg-data stop
+```
+
+then remove the `db/pg-data` directory and the log file. This also removes all roles, including memo_app.
+
+
 
 ## Web UI Screenshot
 ### Home
@@ -56,7 +116,7 @@ bundle exec rubocop
 ![](images/delete.png)
 
 ## API
-REST-based JSON API is available under `/api`.
+A RESTful JSON API is available at `/api`.
 ### Response
 
 ```json
@@ -163,7 +223,57 @@ gem install bundler:4.0.10
 bundle install
 ```
 
+### `ruby` or `bundler` not found after `rbenv install`
+Ensure rbenv is on your PATH by adding the following:
+```sh
+rbenv init
+```
+
+### `PG::FeatureNotSupported: extension "uuid-ossp" is not available
+`uuid-ossp` is in the contrib package. 
+```sh
+# On Debian / Ubuntu
+apt install postgresql-contrib
+# On Fedora / RHEL
+dnf install postgresql-contrib
+```
+
+### PostgreSQL setup on Debian / Ubuntu
+
+The steps above assume a plain PostgreSQL install (e.g. macOS + Homebrew), where
+`initdb`, `pg_ctl`, `createuser` and `createdb` are on the `PATH` right after installation.
+On Debian / Ubuntu, the `apt` packages place the server binaries in a versioned
+directory outside the default `PATH` and manage clusters with their own tooling.
+Apply the following adjustments:
+
+1. **`initdb: command not found`** — put the binaries on the `PATH` (session-only; repeat in new shells):
+    ```sh
+    export PATH=/usr/lib/postgresql/15/bin:$PATH
+    ```
+    (replace `15` with your version — see `pg_lsclusters`)
+
+2. **`could not create lock file "/var/run/postgresql/..."`** — Debian's default
+   Unix socket directory is owned by the `postgres` user. Add `-k /tmp` when starting:
+    ```sh
+    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678 -k /tmp" start
+    ```
+
+### PostgreSQL setup on Fedora / RHEL
+on Fedora / RHEL, `dnf install postgresql` installs the client only. install the server package as well:
+```sh
+sudo dnf install postgresql-server
+```
+then confirm:
+```sh
+which initdb pg_ctl psql createuser createdb
+```
+
 
 ## References
 - sinatra [Command Line](https://github.com/sinatra/sinatra#command-line)
-- rack-unreloader https://github.com/jeremyevans/rack-unreloader
+- jeremyevans/rack-unreloader [https://github.com/jeremyevans/rack-unreloader](https://github.com/jeremyevans/rack-unreloader)
+- ged/ruby-pg [https://www.deveiate.org/code/pg/README_md.html](https://www.deveiate.org/code/pg/README_md.html)
+- initdb [PostgreSQL Server Applications | initdb](https://www.postgresql.org/docs/current/app-initdb.html)
+- pg_ctl [PostgreSQL Server Applications | pg_ctl](https://www.postgresql.org/docs/current/app-pg-ctl.html)
+- createuser [PostgreSQL Server Applications | createuser](https://www.postgresql.org/docs/current/app-createuser.html)
+- createdb [PostgreSQL Server Applications | createdb](https://www.postgresql.org/docs/current/app-createdb.html)
