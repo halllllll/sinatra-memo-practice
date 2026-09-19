@@ -5,10 +5,10 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 - Bundler
 - rbenv
 - rubocop
-- PostgreSQL
+- PostgreSQL **server** tools (`initdb`, `pg_ctl`) plus client tools (`psql`, `createuser`)
 
 ## Setup
-this sample app uses the following database properties:
+this sample app uses the following database settings:
 
   |property||
   |--|--|
@@ -19,7 +19,7 @@ this sample app uses the following database properties:
   |password|memo_pass|
 
 
-DDL: [db/init.sql](./db/init.sql)
+the database schema is defined in: [db/init.sql](./db/init.sql)
 
 ---
 
@@ -29,9 +29,13 @@ DDL: [db/init.sql](./db/init.sql)
     - `git checkout -b dev origin/dev`
 3. prepare Ruby environment
     - `rbenv install`
+    - if the command above fails, please refer to the official documentation: [rbenv/ruby-build/wiki#suggested-build-environment](https://github.com/rbenv/ruby-build/wiki#suggested-build-environment)
 4. install gems
     - `bundle install`
 5. create `PGDATA` directory with password authentication.
+ 
+    on Debian / Ubuntu, this step and the next need adjustments - see: [Troubleshooting - PostgreSQL setup on Debian / Ubuntu](#postgresql-setup-on-debian-or-ubuntu)
+
     ```sh
     initdb --encoding=UTF8 --no-locale -A scram-sha-256 -D ./db/pg-data -W
     ```
@@ -39,7 +43,7 @@ DDL: [db/init.sql](./db/init.sql)
 
 6. start the PostgreSQL server on port `5678`. (logs are written to `db/memo.log`):
     ```sh
-    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678" start
+    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678 -k /tmp" start
     ```
 
 7. create a database role for this app
@@ -112,7 +116,7 @@ then remove the `db/pg-data` directory and the log file. This also removes all r
 ![](images/delete.png)
 
 ## API
-REST-based JSON API is available under `/api`.
+A RESTful JSON API is available at `/api`.
 ### Response
 
 ```json
@@ -217,6 +221,51 @@ This is caused by a version mismatch between `bundler` and `Gemfile.lock`. Align
 ```sh
 gem install bundler:4.0.10
 bundle install
+```
+
+### `ruby` or `bundler` not found after `rbenv install`
+Ensure rbenv is on your PATH by adding the following:
+```sh
+rbenv init
+```
+
+### `PG::FeatureNotSupported: extension "uuid-ossp" is not available
+`uuid-ossp` is in the contrib package. 
+```sh
+# On Debian / Ubuntu
+apt install postgresql-contrib
+# On Fedora / RHEL
+dnf install postgresql-contrib
+```
+
+### PostgreSQL setup on Debian / Ubuntu
+
+The steps above assume a plain PostgreSQL install (e.g. macOS + Homebrew), where
+`initdb`, `pg_ctl`, `createuser` and `createdb` are on the `PATH` right after installation.
+On Debian / Ubuntu, the `apt` packages place the server binaries in a versioned
+directory outside the default `PATH` and manage clusters with their own tooling.
+Apply the following adjustments:
+
+1. **`initdb: command not found`** — put the binaries on the `PATH` (session-only; repeat in new shells):
+    ```sh
+    export PATH=/usr/lib/postgresql/15/bin:$PATH
+    ```
+    (replace `15` with your version — see `pg_lsclusters`)
+
+2. **`could not create lock file "/var/run/postgresql/..."`** — Debian's default
+   Unix socket directory is owned by the `postgres` user. Add `-k /tmp` when starting:
+    ```sh
+    pg_ctl -D ./db/pg-data -l ./db/memo.log -o "-p 5678 -k /tmp" start
+    ```
+
+### PostgreSQL setup on Fedora / RHEL
+on Fedora / RHEL, `dnf install postgresql` installs the client only. install the server package as well:
+```sh
+sudo dnf install postgresql-server
+```
+then confirm:
+```sh
+which initdb pg_ctl psql createuser createdb
 ```
 
 
