@@ -61,8 +61,8 @@ class App < Sinatra::Base
 
   post '/memos' do
     validate_params(params, :'new.html')
-    new_memo = Memo.new(title: params[:title], content: params[:content])
-    Memo.add(new_memo)
+
+    Memo.add(title: params[:title], content: params[:content])
 
     redirect '/'
   end
@@ -88,10 +88,7 @@ class App < Sinatra::Base
 
   patch '/memos/:id' do
     validate_params(params, :'edit.html')
-
-    edited_memo = Memo.new(id: params['id'], title: params['title'], content: params['content'], created_at: @memo.created_at, updated_at: Time.now)
-
-    Memo.update(edited_memo)
+    edited_memo = Memo.update(id: params[:id], title: params[:title], content: params[:content])
 
     @memo = edited_memo
     redirect "/memos/#{params['id']}/detail"

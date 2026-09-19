@@ -13,6 +13,8 @@ module DB
       password: 'memo_pass'
     )
 
+    @conn.field_name_type = :symbol
+
     sql = Pathname(__dir__).join('init.sql').read
     @conn.exec(sql)
   end

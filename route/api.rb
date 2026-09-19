@@ -11,11 +11,10 @@ class ApiRoute < Sinatra::Base
     halt 400, json({ result: 'error', message: 'required parameter not found' }) if [params[:title], params[:content]].any?(nil)
     halt 400, json({ result: 'error', message: 'empty value not acceptable' }) if [params[:title], params[:content]].map(&:strip).any?(&:empty?)
 
-    new_memo = Memo.new(title: params[:title], content: params[:content])
-    Memo.add(new_memo)
+    added_memo = Memo.add(title: params[:title], content: params[:content])
 
     status 201
-    json({ result: 'success', body: new_memo.to_json })
+    json({ result: 'success', body: added_memo.to_json })
   end
 
   get '/api/memos/:id' do
@@ -31,12 +30,7 @@ class ApiRoute < Sinatra::Base
     halt 404, json({ result: 'error', message: 'memo not found' }) unless memo
     halt 400, json({ result: 'error', message: 'invalid parameter' }) if [params[:title], params[:content]].any?(nil)
 
-    memo.title = params[:title]
-    memo.content = params[:content]
-    memo.updated_at = Time.now
-
-    Memo.update(memo)
-
+    Memo.update(id: memo_id, title: params[:title], content: params[:content])
     status 204
   end
 

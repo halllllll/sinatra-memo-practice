@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'csv'
-require 'securerandom'
-
-DATA_FILE = 'memos.csv'
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 class Memo
@@ -13,9 +9,9 @@ class Memo
   def initialize(
     title:,
     content:,
-    id: SecureRandom.uuid,
-    created_at: Time.now,
-    updated_at: Time.now
+    id: nil,
+    created_at: nil,
+    updated_at: nil
   )
     @id = id
     @title = title
@@ -35,37 +31,37 @@ class Memo
   end
 
   class << self
+    def from_row(row)
+      new(**row.slice(:id, :title, :content),
+        created_at: Time.strptime(row[:created_at], DATE_FORMAT),
+        updated_at: Time.strptime(row[:updated_at], DATE_FORMAT))
+    end
+
     def all
       result = DB.conn.exec('SELECT * FROM memos')
-      result.field_name_type = :symbol
+
       result.map do |row|
-        Memo.new(
-          **row.slice(:id, :title, :content),
-          created_at: Time.strptime(row[:created_at], DATE_FORMAT),
-          updated_at: Time.strptime(row[:updated_at], DATE_FORMAT)
-        )
+        Memo.from_row(row)
       end
     end
 
-    def add(memo)
-      DB.conn.exec_params('INSERT INTO memos(title, content) VALUES($1, $2)', [memo.title, memo.content])
+    def add(title:, content:)
+      result = DB.conn.exec_params('INSERT INTO memos(title, content) VALUES($1, $2) RETURNING *', [title, content])
+
+      Memo.from_row(result.first)
     end
 
-    def update(memo)
-      DB.conn.exec_params('UPDATE memos SET title = $2, content = $3, updated_at = $4 WHERE id = $1', [memo.id, memo.title, memo.content, memo.updated_at])
+    def update(id:, title:, content:)
+      result = DB.conn.exec_params('UPDATE memos SET title = $2, content = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *', [id, title, content])
+
+      Memo.from_row(result.first)
     end
 
     def find(memo_id)
       result = DB.conn.exec_params('SELECT * FROM memos WHERE id = $1', [memo_id])
       return nil if result.ntuples.zero?
 
-      result.field_name_type = :symbol
-      row = result.first
-      Memo.new(
-        **row.slice(:id, :title, :content),
-        created_at: Time.strptime(row[:created_at], DATE_FORMAT),
-        updated_at: Time.strptime(row[:updated_at], DATE_FORMAT)
-      )
+      Memo.from_row(result.first)
     end
 
     def delete(memo_id)
