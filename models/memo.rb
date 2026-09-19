@@ -38,7 +38,7 @@ class Memo
     end
 
     def all
-      result = DB.conn.exec('SELECT * FROM memos')
+      result = DB.conn.exec('SELECT * FROM memos ORDER BY memos.created_at')
 
       result.map do |row|
         Memo.from_row(row)
