@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+require 'time'
 
 class Memo
   attr_accessor :title, :content, :updated_at
   attr_reader :id, :created_at
+
+  DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
   def initialize(
     title:,

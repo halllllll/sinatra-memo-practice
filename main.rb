@@ -3,7 +3,6 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'rack/protection'
-require 'time'
 
 require_relative 'db/db'
 require_relative 'route/api'
@@ -88,9 +87,9 @@ class App < Sinatra::Base
 
   patch '/memos/:id' do
     validate_params(params, :'edit.html')
-    edited_memo = Memo.update(id: params[:id], title: params[:title], content: params[:content])
 
-    @memo = edited_memo
+    Memo.update(id: params[:id], title: params[:title], content: params[:content])
+
     redirect "/memos/#{params['id']}/detail"
   end
 
