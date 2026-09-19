@@ -17,6 +17,10 @@ this sample app uses the following database properties:
   |dbname|memo_db|
   |user|memo_app|
   |password|memo_pass|
+
+
+DDL: [db/init.sql](./db/init.sql)
+
 ---
 
 1. clone this repository
@@ -57,13 +61,13 @@ this sample app uses the following database properties:
 ## Commands
 
 ### Run the App
-On startup, the app runs `pg/init.sql` to create the `memos` table if it does not exit.
+On startup, the app runs `db/init.sql` to create the `memos` table if it does not exist.
 ```sh
 bundle exec puma config.ru -p 4567
 ```
 Visit [http://localhost:4567/](http://localhost:4567/).
 
-Memos are stored in the `memo_db` PostgreSQL dtabase.
+Memos are stored in the `memo_db` PostgreSQL database.
 Puma's default port is `9292`; use `-p` to specify a different port.
 
 
@@ -218,4 +222,9 @@ bundle install
 
 ## References
 - sinatra [Command Line](https://github.com/sinatra/sinatra#command-line)
-- rack-unreloader https://github.com/jeremyevans/rack-unreloader
+- jeremyevans/rack-unreloader [https://github.com/jeremyevans/rack-unreloader](https://github.com/jeremyevans/rack-unreloader)
+- ged/ruby-pg [https://www.deveiate.org/code/pg/README_md.html](https://www.deveiate.org/code/pg/README_md.html)
+- initdb [PostgreSQL Server Applications | initdb](https://www.postgresql.org/docs/current/app-initdb.html)
+- pg_ctl [PostgreSQL Server Applications | pg_ctl](https://www.postgresql.org/docs/current/app-pg-ctl.html)
+- createuser [PostgreSQL Server Applications | createuser](https://www.postgresql.org/docs/current/app-createuser.html)
+- createdb [PostgreSQL Server Applications | createdb](https://www.postgresql.org/docs/current/app-createdb.html)
