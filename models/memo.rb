@@ -3,8 +3,8 @@
 require 'time'
 
 class Memo
-  attr_accessor :title, :content, :updated_at
-  attr_reader :id, :created_at
+  attr_accessor :title, :content
+  attr_reader :id, :created_at, :updated_at
 
   DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
