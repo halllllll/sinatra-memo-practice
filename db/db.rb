@@ -6,11 +6,11 @@ require 'pathname'
 module DB
   def self.connect!
     @conn = PG::Connection.new(
-      host: 'localhost',
-      user: 'memo_app',
-      dbname: 'memo_db',
-      port: '5678',
-      password: 'memo_pass'
+      host: ENV['DB_HOST'],
+      user: ENV['DB_USER'],
+      dbname: ENV['DB_NAME'],
+      port: ENV['DB_PORT'],
+      password: ENV['DB_PASS']
     )
 
     @conn.field_name_type = :symbol

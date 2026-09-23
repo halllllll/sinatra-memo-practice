@@ -10,13 +10,13 @@ Ruby の軽量Webアプリケーションライブラリ [Sinatra](https://sinat
 ## Setup
 this sample app uses the following database settings:
 
-  |property||
-  |--|--|
-  |host|localhost|
-  |port|5678 (**NOT** the default 5432)|
-  |dbname|memo_db|
-  |user|memo_app|
-  |password|memo_pass|
+  |property|env var||
+  |--|--|--|
+  |host|`DB_HOST`|localhost|
+  |port|`DB_PORT`|5678 (**NOT** the default 5432)|
+  |dbname|`DB_NAME`|memo_db|
+  |user|`DB_USER`|memo_app|
+  |password|`DB_PASS`|memo_pass|
 
 
 the database schema is defined in: [db/init.sql](./db/init.sql)
@@ -66,7 +66,14 @@ the database schema is defined in: [db/init.sql](./db/init.sql)
 
 ### Run the App
 On startup, the app runs `db/init.sql` to create the `memos` table if it does not exist.
+
+Because the connection settings are read from environment variables (see [db/db.rb](./db/db.rb)), you must set them when running the app. For this sample:
 ```sh
+DB_HOST=localhost \
+DB_PORT=5678 \
+DB_NAME=memo_db \
+DB_USER=memo_app \
+DB_PASS=memo_pass \
 bundle exec puma config.ru -p 4567
 ```
 Visit [http://localhost:4567/](http://localhost:4567/).
@@ -228,6 +235,9 @@ Ensure rbenv is on your PATH by adding the following:
 ```sh
 rbenv init
 ```
+
+### puma startup error: `PG::ConnectionBad`
+The database connection settings are wrong.
 
 ### `PG::FeatureNotSupported: extension "uuid-ossp" is not available
 `uuid-ossp` is in the contrib package. 
