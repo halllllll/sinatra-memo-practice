@@ -1,2 +1,6 @@
 .zed
 memos.csv
+db/*
+
+!db/init.sql
+!db/db.rb
